@@ -1,0 +1,638 @@
+---
+title: "Curso R - Básico"
+subtitle: "Módulo 2. Matrices, factores y datatables"
+author: "Julio Úbeda Quesada"
+date: "`r format(Sys.time(), '%d/%m/%Y, %H:%M')`"
+abstract: |
+ Este documento corresponde al segundo día del curso básico de R...
+output: 
+  html_document:
+    df_print: paged
+    theme: united
+    toc: true
+    toc_float: true
+---
+
+<!-- INITIALIZATION -->
+
+```{r setup, echo=FALSE}
+knitr::opts_chunk$set(message = FALSE,
+                      warning = FALSE,
+                      fig.align='center',
+                      fig.height= 8,
+                      fig.width=12
+)
+```
+
+# **1. ¿Qué es una matriz?**
+
+En R, una **matriz** es una estructura bidimensional: tiene un número fijo de **filas y columnas**. Cada elemento debe ser del mismo tipo (números, texto o valores lógicos).
+
+Imagina que registras cuántos peces capturaste en **dos regiones distintas** durante **tres días**. Puedes usar `matrix()` para organizar esos datos así:
+
+```{r}
+matrix(1:6, byrow = TRUE, nrow = 3)
+```
+
+Aquí:
+
+* `1:6` crea los datos (como `c(1, 2, 3, 4, 5, 6)`)
+* `byrow = TRUE` indica que los datos se colocan por filas (día por día)
+* `nrow = 3` significa que hay **3 días de pesca**
+
+## 1.1. Crea tu matriz
+
+Supongamos que tienes tres vectores, cada uno con las capturas de un tipo de pez (merluza, jurel, lenguado) en dos regiones: costa norte y costa sur.
+
+```{r}
+merluza <- c(15, 20)    # Norte, Sur
+jurel   <- c(12, 25)
+lenguado <- c(10, 18)
+```
+
+Combina todo en un solo vector y crea la matriz:
+
+```{r}
+capturas <- c(merluza, jurel, lenguado)
+pesca_matrix <- matrix(capturas, byrow = TRUE, nrow = 3)
+print(pesca_matrix)
+```
+
+
+## 1.2. Nombrar una matriz
+
+Vamos a añadir nombres para facilitar la lectura. Ya tienes:
+
+```{r}
+nombres_filas <- c("Merluza", "Jurel", "Lenguado")
+nombres_columnas <- c("Norte", "Sur")
+```
+
+Asigna esos nombres:
+
+```{r}
+rownames(pesca_matrix) <- nombres_filas
+colnames(pesca_matrix) <- nombres_columnas
+print(pesca_matrix)
+```
+
+
+## 1.3. Cálculo de capturas totales
+
+Para saber cuántos peces capturaste **en total por especie** (es decir, por fila):
+
+```{r}
+total_por_especie <- rowSums(pesca_matrix)
+```
+
+El resultado es un vector con el total de cada especie en las dos regiones.
+
+
+## 1.4. Añadir una columna con el total
+
+Ahora puedes añadir ese total como nueva columna:
+
+```{r}
+pesca_completa <- cbind(pesca_matrix, Total = total_por_especie)
+```
+
+
+## 1.5. Añadir una fila
+
+Supón que tienes otra matriz con capturas de las mismas especies pero durante **otra jornada de pesca**, por ejemplo:
+
+```{r}
+pesca_matrix2 <- matrix(c(17, 19, 14, 22, 11, 20), byrow = TRUE, nrow = 3)
+rownames(pesca_matrix2) <- c("Merluza", "Jurel", "Lenguado")
+colnames(pesca_matrix2) <- c("Norte", "Sur")
+```
+
+Une ambas jornadas:
+
+```{r}
+todas_las_jornadas <- rbind(pesca_matrix, pesca_matrix2)
+```
+
+
+## 1.6. Capturas totales por región
+
+Para saber cuántos peces capturaste en total en cada **región** (columna):
+
+```{r}
+total_por_region <- colSums(todas_las_jornadas)
+```
+
+
+## 1.7.Seleccionar elementos
+
+Puedes extraer partes específicas de la matriz:
+
+```{r}
+# Capturas en la región Sur
+sur_all <- todas_las_jornadas[, "Sur"]
+
+# Promedio de capturas en Sur
+mean(sur_all)
+
+# Capturas en Sur solo de las dos primeras especies
+sur_algunas <- todas_las_jornadas[1:2, "Sur"]
+mean(sur_algunas)
+```
+
+## 1.8. Aritmética con matrices – Estimar ingresos
+
+Supón que por cada captura vendida, ganas 10 dólares. Puedes multiplicar la matriz para saber los ingresos estimados:
+
+```{r}
+ingresos <- todas_las_jornadas * 10
+```
+
+## 1.9. Aritmética con precios variables
+
+Imagina que el precio de venta por especie y región está en esta matriz:
+
+```{r}
+precios <- matrix(c(8, 9, 7, 10, 6, 11), byrow = TRUE, nrow = 3)
+rownames(precios) <- c("Merluza", "Jurel", "Lenguado")
+colnames(precios) <- c("Norte", "Sur")
+```
+
+Calcula los ingresos reales:
+
+```{r}
+ingresos_reales <- pesca_matrix * precios
+```
+
+Extrae ingresos solo de la región norte:
+
+```{r}
+ingresos_norte <- ingresos_reales[, "Norte"]
+mean(ingresos_norte)
+```
+
+---
+
+# **2. ¿Qué es un *factor* y por qué lo usarías?**
+
+En este capítulo te sumergirás en el maravilloso mundo de los **factores**.
+
+El término *factor* se refiere a un tipo de dato estadístico usado para almacenar **variables categóricas**. A diferencia de las variables continuas, las categóricas pueden tomar un **número limitado de valores** o categorías.
+
+Es importante que R sepa si está trabajando con una variable continua o categórica, ya que esto afecta el análisis estadístico que se puede realizar más adelante.
+
+Un buen ejemplo de variable categórica es el **sexo**. En muchos casos puede limitarse a dos categorías: `"Male"` (hombre) o `"Female"` (mujer).
+
+**Asigna a la variable `theory` el valor `"factors"`.**
+
+Puedes crear factores en R con la función `factor()`.
+
+Primero, define un vector con observaciones categóricas:
+
+```{r}
+sex_vector <- c("Male", "Female", "Female", "Male", "Male")
+```
+
+Este vector contiene dos niveles (categorías): `"Male"` y `"Female"`.
+
+Convierte este vector en un factor así:
+
+```{r}
+factor_sex_vector <- factor(sex_vector)
+```
+
+* Convierte `sex_vector` a factor usando `factor()`.
+* Asigna el resultado a `factor_sex_vector`.
+* Imprime `factor_sex_vector` y observa los **niveles del factor** que R muestra.
+
+Existen dos tipos de variables categóricas:
+
+* **Nominales:** no tienen orden (ej. tipos de animales).
+* **Ordinales:** tienen un orden natural (ej. niveles de temperatura).
+
+Ejemplo de variable **nominal**:
+
+```{r}
+animals_vector <- c("Elephant", "Giraffe", "Donkey", "Horse")
+factor_animals_vector <- factor(animals_vector)
+```
+
+Ejemplo de variable **ordinal**:
+
+```{r}
+temperature_vector <- c("High", "Low", "High", "Medium", "Low")
+factor_temperature_vector <- factor(temperature_vector, ordered = TRUE,
+                                    levels = c("Low", "Medium", "High"))
+```
+
+> Ejecuta ambos bloques y observa la diferencia entre un factor nominal y uno ordinal.
+
+## 2.1. Niveles de un factor
+
+A veces necesitas cambiar los nombres de los niveles de un factor para mayor claridad.
+
+Supón que tienes este vector:
+
+```{r}
+survey_vector <- c("M", "F", "F", "M", "M")
+```
+
+Convierte `survey_vector` a factor:
+
+```{r}
+factor_survey_vector <- factor(survey_vector)
+```
+
+Ahora, cambia los niveles `"F"` y `"M"` por `"Female"` y `"Male"`:
+
+```{r}
+levels(factor_survey_vector) <- c("Female", "Male")
+```
+
+**¡Atención!** Verifica el orden con `levels(factor_survey_vector)` antes de renombrar.
+
+## 2.2. Resumen de un factor
+
+La función `summary()` te permite obtener un resumen estadístico de un vector o factor:
+
+```{r}
+summary(factor_survey_vector)
+```
+
+Aplica `summary()` a ambos vectores:
+
+```{r}
+summary(survey_vector)
+summary(factor_survey_vector)
+```
+
+* Observa cómo `summary()` se comporta distinto con un vector de caracteres y un factor.
+* ¿Cuál de los dos resúmenes es más útil para análisis estadístico?
+
+## 2.3. Comparación de técnicas de pesca
+
+Quizás te preguntes qué sucede cuando intentas comparar elementos de un **factor**. Supongamos que tienes un factor con dos niveles: `"Diamante"` y `"Rombo"`, que representan dos tipos de **redes de pesca** utilizadas en una campaña Pero ¿cómo interpreta R la relación entre ellas?
+
+Vamos a probar qué ocurre si intentas comparar una red con otra:
+
+```{r}
+net_vector <- c("Diamante", "Rombo", "Rombo", "Rombo", "Diamante")
+factor_net_vector <- factor(net_vector)
+
+# ¿Es 'Red' mayor que 'Green'?
+factor_net_vector[2] > factor_net_vector[1]
+```
+
+## 2.4. Factores ordenados
+
+En este ejemplo, `"Diamante"` y `"Rombo"` son **categorías sin orden natural** (es decir, son factores **nominales**). R te devolverá un **mensaje de advertencia**, porque usar el operador `>` no tiene sentido para factores no ordenados.
+
+Pero esto cambia cuando trabajas con variables que **sí tienen un orden lógico**.
+
+Imagina ahora que lideras un equipo de pescadores y evaluaste la **eficacia de sus técnicas de pesca** con tres niveles: `"baja"`, `"media"` y `"alta"`. Guardas esta información en un vector llamado `efficiency_vector`.
+
+Aquí están los resultados para cinco pescadores:
+
+* Pescador 1: media
+* Pescador 2: baja
+* Pescador 3: baja
+* Pescador 4: media
+* Pescador 5: alta
+
+```{r}
+efficiency_vector <- c("media", "baja", "baja", "media", "alta")
+```
+
+Ahora debes transformar `efficiency_vector` en un **factor ordenado**, ya que `"baja" < "media" < "alta"`.
+
+Para ello, usa la función `factor()` con los argumentos `ordered = TRUE` y `levels = c("baja", "media", "alta")`.
+
+```{r}
+factor_efficiency_vector <- factor(efficiency_vector,
+                                   ordered = TRUE,
+                                   levels = c("baja", "media", "alta"))
+```
+
+## 2.5. Comparando factores ordenados
+
+Uno de los pescadores (el número 2) se queja de que el pescador número 5 está **ralentizando la producción**. Como líder del equipo, decides verificarlo con datos.
+
+Ahora que `factor_efficiency_vector` es un **factor ordenado**, puedes comparar sus elementos usando operadores lógicos.
+
+```{r}
+# Selecciona el rendimiento del pescador 2 y 5
+pescador2 <- factor_efficiency_vector[2]
+pescador5 <- factor_efficiency_vector[5]
+
+# ¿Es el pescador 2 más eficiente que el 5?
+pescador2 > pescador5
+```
+
+Esto te permitirá **validar objetivamente** la queja. Si R devuelve `FALSE`, sabrás que el pescador 5 no está por debajo del 2 en rendimiento.
+
+---
+# **3. ¿Qué es un *data frame*?**
+
+En el capítulo sobre matrices vimos que todos los elementos deben ser del mismo tipo. En aquel momento, por ejemplo, una matriz de capturas solo contenía valores numéricos, como kilogramos por especie.
+
+Sin embargo, al trabajar con datos pesqueros reales —como los recogidos en campañas científicas o diarios de pesca— es habitual encontrarse con variables de distintos tipos:
+
+* "¿Se utilizó arte de arrastre?" → tipo lógico (`logical`)
+* "¿Cuántos kilos se desembarcaron?" → numérico (`numeric`)
+* "¿Cuál es la zona de pesca?" → carácter (`character`)
+* "¿Qué especie se capturó?" → carácter (`character`)
+
+En estos casos, necesitamos un tipo de estructura que permita combinar variables de diferentes tipos. En R, esto se llama un *data frame*.
+
+Un *data frame* organiza los datos en **columnas** (variables) y **filas** (observaciones).
+
+Por ejemplo, cada fila podría representar una marea de pesca, y cada columna una característica de esa marea: zona, tipo de arte, especie capturada, etc.
+
+## 3.1. Crear un *data frame*
+
+Ahora crearás tu propio *data frame* con datos ficticios del sector pesquero.
+Supongamos que has recogido información de 6 mareas distintas. Las variables que quieres almacenar son:
+
+* Nombre del barco
+* Arte de pesca utilizado
+* Kilogramos desembarcados
+* Zona FAO
+* Si la marea fue observada por un inspector (TRUE/FALSE)
+
+Primero definimos los vectores:
+
+```{r}
+barco <- c("Atún I", "Mar Azul", "Pesca Norte", "Océano V", "Costa Libre", "Delta Sur")
+arte <- c("Palangre", "Arrastre", "Cerco", "Arrastre", "Palangre", "Cerco")
+kg_desembarcados <- c(1200, 3400, 1500, 2200, 900, 1800)
+zona_fao <- c("27.8.c", "27.8.c", "27.9.a", "27.9.a", "27.10.a", "27.10.a")
+inspeccion <- c(TRUE, FALSE, TRUE, FALSE, TRUE, FALSE)
+```
+
+Ahora construimos el *data frame*:
+
+```{r}
+mareas_df <- data.frame(barco, arte, kg_desembarcados, zona_fao, inspeccion)
+```
+
+## 3.2. Cargar y manipulacion inicial del dataframe
+
+Antes de comenzar con el análisis de datos, es importante establecer el espacio de trabajo y cargar los paquetes necesarios. Este bloque de código prepara el entorno para trabajar con el paquete tidyverse y otros recursos útiles como kableExtra y knitr.
+
+```{r load_libraries, include=FALSE, results='hide'}
+rm(list=ls())
+
+#--------------ESPACIO DE TRABAJO Y RUTAS RELATIVAS---------------#
+# Modificar por el path del directorio de trabajo 
+home_file  = "C:/Users/jubeda2/Downloads/Curso R Basico/Modulo 2. Matrices, factores y datatables"
+data_loc   = paste0(home_file,"/3. Datos/")
+
+#--------------PAQUETES NECESARIOS PARA EL CURSO---------------#
+Packages = c("readxl", "tidyverse", "kableExtra", "knitr")
+
+# Instalar los paquetes que no estén instalados
+new_packages <- Packages[!(Packages %in% installed.packages()[,"Package"])]
+if(length(new_packages)) install.packages(new_packages)
+
+# Cargar los paquetes
+lapply(Packages, library, character.only = TRUE)
+```
+
+Vamos a trabajar con el dataset DatosPesca, que contiene información sobre desembarques de la flota española en la zona de pesca 27. Utilizaremos funciones del paquete dplyr para manipular y explorar estos datos de forma eficiente.
+
+```{r, Input}
+# Definir la ruta del archivo
+file_path <- paste0(data_loc, "DatosPesca.xlsx")
+
+# Cargar el archivo Excel
+df <- read_excel(file_path)
+
+# Mostramos la estructura del dataset
+cat("La estructura del conjunto de datos de pesqueros en la zona 27:\n\n")
+str(df)
+```
+
+**¿Qué hace este bloque de código?**
+
+- `file_path`: construye la ruta al archivo de datos.
+- `read_excel()`: importa el archivo Excel y lo convierte en un dataframe.
+- `str(df)`: muestra la estructura del dataframe (variables, tipos de datos, etc.), lo cual es útil para entender cómo está organizado antes de analizarlo.
+
+### 3.2.1. Exploración inicial y limpieza básica
+#### 3.2.1.1. Comprobar valores faltantes
+
+Comenzamos revisando que columnas tienen datos faltantes y priorizamos su tratamiento.
+
+```{r, NaCount}
+# ¿Cuántos valores NA hay por columna?
+colSums(is.na(df))
+```
+
+**¿Qué hace este bloque de código?**
+
+- `is.na(df)`: crea una matriz booleana que indica si cada valor es NA.
+- `colSums()`: suma cuántos NA hay por columna.
+- El resultado permite identificar qué variables tienen más valores faltantes.
+
+> **Desafío 1:** ¿Puedes identificar cuántos registros tienen PesoConsumo == NA y en qué proporción respecto al total?
+
+### 3.2.2. Eliminar columnas irrelevantes
+
+Eliminar columnas irrelevantes simplifica el análisis al reducir ruido y evitar duplicidades, mejora la velocidad de procesamiento y facilita la interpretación y visualización de los datos, permitiendo tomar decisiones más claras y eficientes.
+
+```{r, DropCols}
+# Eliminar columnas irrelevantes
+df$CodigoArteDC <- NULL
+df$CODREG <- NULL
+```
+
+**¿Qué hace este bloque de código?**
+
+- Se eliminan dos columnas específicas (CodigoArteDC y CODREG) del dataframe.
+- El objetivo es evitar redundancia o información poco útil para el análisis.
+
+En algunas ocasiones es recomendable mantener un criterio logico para eliminar las columnas con respecto a la cantidad de valores nulos. Por ejemplo, imagina que solo queremos las columnas que tengan menos del 50 % de sus valores ausentes.
+
+```{r, DropColsProp}
+# Calcular porcentaje de NA por columna
+porc_na <- colSums(is.na(df)) / nrow(df)
+
+# Seleccionar columnas con menos de 50% de NA
+columnas_utiles <- names(porc_na[porc_na <= 0.5])
+
+# Filtrar el dataframe solo con esas columnas
+df <- df[, columnas_utiles]
+
+# Verificamos
+head(df, 5) %>% 
+          kable(caption = "Dataset con columnas utiles:", "html") %>% 
+          kable_styling(font_size = 12, full_width = TRUE)
+```
+
+**¿Qué hace este bloque de código?**
+
+- Calcula el porcentaje de valores faltantes por columna (porc_na).
+- Selecciona las columnas donde menos del 50% de los valores están ausentes.
+- Filtra el dataframe para conservar solo esas columnas “útiles”.
+
+> **Desafío 2:** ¿Encuentras columnas que contengan exactamente la misma información con diferente nombre?
+
+### 3.2.3. Convertir variables a tipos apropiados
+
+Convertir correctamente los tipos de datos en un dataframe es fundamental porque permite que R interprete y manipule la información de manera adecuada. Esto mejora la precisión en los cálculos, facilita el análisis estadístico, y asegura que las funciones aplicadas a cada variable funcionen correctamente. Además, asignar el tipo correcto optimiza el uso de memoria y acelera el procesamiento, lo que es clave cuando se manejan grandes volúmenes de datos como en la gestión pesquera.
+
+```{r, DataType}
+# Convertir a factor (categoría)
+df$REP_MS <- as.factor(df$REP_MS)
+df$CodigoArte <- as.factor(df$CodigoArte)
+df$PuertoDesembarque <- as.factor(df$PuertoDesembarque)
+
+# Convertir a character (cadena de texto)
+df$Marea <- as.character(df$Marea)
+df$RectanguloEstadistico <- as.character(df$RectanguloEstadistico)
+
+# Convertir a numeric (números)
+df$YEAR_DC <- as.numeric(df$YEAR_DC)
+df$AÑO_CAPTURA <- as.numeric(df$AÑO_CAPTURA)
+df$PesoConsumo <- as.numeric(df$PesoConsumo)
+
+# Convertir a integer (enteros)
+df$MONTH <- as.integer(df$MONTH)
+df$TamañoMalla <- as.integer(df$TamañoMalla)
+
+# Convertir a Date (fecha sin tiempo)
+df$FechaCaptura <- as.Date(df$FechaCaptura)
+```
+
+**¿Qué hace este bloque de código?**
+
+- Convierte distintas columnas del dataframe a su tipo de dato adecuado (factor, character, numeric, integer, Date).
+- Esta conversión es fundamental para garantizar que las funciones estadísticas y gráficas funcionen correctamente.
+
+### 3.2.4. Detección y eliminación de duplicados
+
+```{r, DuplicateCheck}
+# Verificar duplicados exactos
+print(sum(duplicated(df)))
+
+# Eliminar duplicados
+df <- df[!duplicated(df), ]
+```
+
+**¿Qué hace este bloque de código?**
+
+- `duplicated(df)`: detecta filas duplicadas completas en el dataframe.
+- `sum(...)`: cuenta cuántos duplicados hay.
+
+Se eliminan los duplicados conservando solo la primera aparición de cada fila.
+
+## 3.3. Generación de nuevas variables
+### 3.3.1. Año-Mes y día de la semana
+
+```{r}
+df$AñoMes <- format(df$FechaCaptura, "%Y-%m")
+df$DiaSemana <- weekdays(df$FechaCaptura)
+
+print(unique(df$AñoMes))
+print(unique(df$DiaSemana))
+```
+
+**¿Qué hace este bloque de código?**
+
+- `format(..., "%Y-%m")`: extrae año y mes de la fecha.
+- `weekdays()`: obtiene el nombre del día de la semana.
+
+Se crean nuevas variables que permiten análisis temporales más detallados.
+
+## 3.4. Clasificar zonas en regiones
+
+```{r}
+df$Region <- ifelse(grepl("27.7", df$Zona), "Atlántico Noroeste",
+              ifelse(grepl("27.8", df$Zona), "Atlántico Centro-Oeste", "Otra región"))
+
+print(unique(df$Region))
+```
+
+**¿Qué hace este bloque de código?**
+
+- Usa `grepl()` para identificar patrones dentro de la columna Zona.
+- Asigna una etiqueta de región basada en esos patrones.
+
+Se crea una nueva variable categórica llamada Region.
+
+## 3.5. Agregaciones y resúmenes
+### 3.5.1. Total desembarcado por especie
+
+```{r}
+total_por_especie <- aggregate(df$PesoDesembarcadoVivoTotal, 
+                                by = list(Especie = df$AL3Especie), 
+                                FUN = sum, na.rm = TRUE)
+
+# Ordenar
+total_por_especie <- total_por_especie[order(-total_por_especie$x), ]
+
+# Verificamos
+head(total_por_especie, 5) %>% 
+          kable(caption = "Total desembarcado por especie:", "html") %>% 
+          kable_styling(font_size = 12, full_width = TRUE)
+```
+
+**¿Qué hace este bloque de código?**
+
+- Agrupa los datos por especie (AL3Especie) y suma el peso desembarcado (PesoDesembarcadoVivoTotal).
+- Usa na.rm = TRUE para ignorar valores faltantes
+- Ordena el resultado de mayor a menor total.
+
+### 3.5.2. Desembarques por puerto
+
+```{r}
+tabla_puertos <- table(df$PuertoDesembarque)
+tabla_puertos <- sort(tabla_puertos, decreasing = TRUE)
+
+# Verificamos
+head(tabla_puertos, 5) %>% 
+          kable(caption = "Puertos de mayor a menor frecuencia:", "html") %>% 
+          kable_styling(font_size = 12, full_width = TRUE)
+```
+
+**¿Qué hace este bloque de código?**
+
+- Cuenta el número de registros por puerto de desembarque.
+- Ordena la tabla de frecuencias de mayor a menor.
+
+> **Desafio 3:** Crear una tabla con el total anual de cada especie.
+
+## 3.6. Validación y exportación
+### 3.6.1. Validación rápida
+
+```{r, validation}
+summary(df)
+```
+
+**¿Qué hace este bloque de código?**
+
+- `summary(df)`: proporciona estadísticas básicas por columna (mínimos, máximos, medias, etc.).
+
+> **Desafio Extra:**
+- Filtra los datos solo para zona "27.7.b".
+- Calcula la media de PesoDesembarcadoVivo por especie.
+- ¿Cuál es la especie más importante en esa zona?
+
+# **Conclusiones**
+
+A lo largo de este segundo módulo del curso básico de R, hemos profundizado en tres estructuras fundamentales para el análisis de datos:
+
+**Matrices:**  
+- Aprendimos a construir matrices a partir de vectores y a nombrar sus filas y columnas, lo que mejora significativamente la legibilidad.  
+- Realizamos operaciones básicas como sumas por fila o columna, selección de elementos, y operaciones aritméticas (como estimación de ingresos).  
+- También exploramos cómo combinar matrices y aplicar precios variables mediante multiplicación elemento a elemento.
+  
+**Factores:**  
+- Comprendimos la diferencia entre variables categóricas nominales (sin orden) y ordinales (con orden lógico).  
+- Aprendimos a crear factores, cambiar los nombres de sus niveles, y usar summary() para obtener información estadística relevante.  
+- Descubrimos cómo R trata los factores al compararlos, y por qué es importante definir correctamente si deben ser ordenados o no.  
+
+**Data Frames:**  
+- Introdujimos el uso de data frames como estructuras versátiles para manejar datos reales con múltiples tipos de variables (números, texto, lógicos, fechas).  
+- Aplicamos técnicas esenciales de limpieza y exploración: detección de valores faltantes, eliminación de columnas irrelevantes, conversión de tipos y detección de duplicados.  
+- Creamos nuevas variables útiles para el análisis temporal y geográfico (AñoMes, DiaSemana, Región).  
+- Finalmente, realizamos agregaciones y resúmenes (por especie y puerto) y aplicamos una validación rápida del conjunto de datos.  

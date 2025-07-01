@@ -1,0 +1,715 @@
+---
+title: "Curso R - Básico"
+subtitle: "Módulo 1. Operaciones, Variables y Vectores"
+author: "Julio Úbeda Quesada"
+date: "`r format(Sys.time(), '%d/%m/%Y, %H:%M')`"
+abstract: |
+ Este documento corresponde al primer día del curso básico de R y presenta una introducción práctica al lenguaje R y al entorno RStudio. A través de ejemplos y ejercicios guiados, se explican conceptos fundamentales como operaciones aritméticas, asignación de variables, tipos de datos básicos (numéricos, lógicos y de texto), y la creación y manipulación de vectores. Además, se abordan buenas prácticas como el uso de comentarios y la asignación de nombres a elementos de un vector para mejorar la legibilidad y eficiencia del código. Todo el contenido está enfocado en facilitar el aprendizaje progresivo y aplicado del lenguaje R.
+output: 
+  html_document:
+    df_print: paged
+    theme: united
+    toc: true
+    toc_float: true
+---
+
+<!-- INITIALIZATION -->
+
+```{r setup, echo=FALSE}
+knitr::opts_chunk$set(message = FALSE,
+                      warning = FALSE,
+                      fig.align='center',
+                      fig.height= 8,
+                      fig.width=12
+)
+```
+
+# Introducción
+
+## R
+
+R es un lenguaje especializado en computación estadística y gráficos que en los últimos años ha ido ganando importancia por su utilidad en el ámbito de la ciencia de datos.
+
+- [r-project](https://www.r-project.org/about.html)
+
+## RStudio
+
+RStudio es un entorno de desarrollo integrado (IDE) para R. Incluye una consola, un editor con syntax highlighting que permite la ejecución directa de código, además de herramientas par visualizar gráficos, histórico de comandos, debugging y gestión de entornos de trabajo.
+
+- [RStudio](https://www.rstudio.com/products/rstudio/download/)
+
+---
+
+### Cómo funciona
+
+En el editor, debes escribir código en R para resolver los ejercicios. Cuando envías tu código, cada línea se interpreta y ejecuta en R, y recibes un mensaje indicando si tu código es correcto o no. La salida del código se muestra en la consola.
+
+R utiliza el signo `#` para añadir comentarios, de modo que tú y otros puedan entender de qué trata el código. ¡Como en Twitter! Los comentarios no se ejecutan como código R, por lo que no afectan al resultado. Por ejemplo, *Calcular 3 + 4* en el editor es un comentario.
+
+También puedes ejecutar comandos de R directamente en la consola. Es una buena forma de experimentar con código en R, ya que esa ejecución no se evalúa por corrección.
+
+* En el editor ya hay algo de código de ejemplo. ¿Puedes ver qué líneas son código real de R y cuáles son comentarios?
+* Añade una línea de código que calcule la suma de 6 y 12, y envía tu código.
+
+---
+
+# Aritmética con R
+
+En su forma más básica, R se puede usar como una calculadora simple. Considera los siguientes operadores aritméticos:
+
+* Suma: `+`
+* Resta: `-`
+* Multiplicación: `*`
+* División: `/`
+* Exponenciación: `^`
+* Módulo: `%%`
+
+Los dos últimos pueden necesitar una explicación:
+
+* El operador `^` eleva el número de la izquierda a la potencia del número de la derecha: por ejemplo, `3^2` es 9.
+
+```{r}
+3^2
+```
+
+* El operador módulo devuelve el resto de la división del número de la izquierda entre el de la derecha. Por ejemplo, 5 módulo 3 o `5 %% 3` es 2.
+
+```{r}
+5%%3
+```
+
+Con este conocimiento, sigue las instrucciones para completar el ejercicio:
+
+* Escribe `2^5` en el editor para calcular 2 elevado a la 5.
+* Escribe `28 %% 6` para calcular 28 módulo 6.
+* Envía tu respuesta y observa la salida de R en la consola.
+* Observa cómo se usa el símbolo `#` para añadir comentarios en el código.
+
+> **Nota**: Ejecutar las sentencias y realizar el ejercicio propuesto del archivo "Aritmetrica con R".
+
+---
+
+# Asignación de variables
+
+Un concepto básico en programación estadística es la **variable**.  
+
+Una variable te permite guardar un valor (por ejemplo, la cantidad de peces capturados en un día) o un objeto (como una función) en R. Luego puedes usar el nombre de esa variable para acceder fácilmente al valor u objeto que contiene.
+
+Puedes asignar el valor 20 a una variable llamada `capturas_dia` con el siguiente comando:
+
+```{r}
+capturas_dia <- 20
+```
+
+> **Tu turno**: completa el código en el editor para que asigne el valor 15 a la variable `peces_grandes`. Envía tu respuesta y observa cómo R imprime el valor 15 cuando llamas a `peces_grandes`.
+
+---
+
+## Asignación de variables (2)
+
+Imagina que eres un biólogo marino y estás monitoreando tus capturas diarias. Hoy has atrapado 12 truchas. Puedes almacenar esta cantidad en una variable llamada `truchas_hoy`.
+
+* Escribe el siguiente código en el editor: `truchas_hoy <- 12`. Esto asignará el valor 12 a `truchas_hoy`.
+* Escribe `truchas_hoy` debajo del segundo comentario para que R imprima el valor de `truchas_hoy`.
+* Envía tu respuesta y observa que se imprime el número 12. Ahora, R vincula la variable `truchas_hoy` con el valor 12.
+
+```{r}
+# Asignación de truchas capturadas hoy
+truchas_hoy <- 12
+truchas_hoy  # Esto imprimirá 12
+```
+
+---
+
+## Asignación de variables (3)
+
+Toda jornada de pesca es mejor cuando se captura más de una especie. Además de las truchas, hoy también has capturado 8 salmones. Como buen analista de datos, creas inmediatamente una variable `salmones_hoy` y le asignas el valor 8. Luego, puedes calcular el total de peces capturados:
+
+* Asigna a `salmones_hoy` el valor 8.
+* Suma las variables `truchas_hoy` y `salmones_hoy` y haz que R imprima el resultado.
+* Asigna el resultado de sumar `truchas_hoy` y `salmones_hoy` a una nueva variable `total_peces`.
+
+```{r}
+# Asignación de salmones capturados hoy
+salmones_hoy <- 8
+
+# Calcula el total de peces capturados
+total_peces <- truchas_hoy + salmones_hoy
+total_peces  # Esto imprimirá 20
+```
+
+> **Nota**: Ejecutar las sentencias y realizar el ejercicio propuesto del archivo "Asignacion de variables".
+
+---
+
+## Diferentes tipos de capturas
+
+No siempre se capturan solo peces del mismo tipo. Si intentaras sumar `truchas_hoy` con una variable que contenga texto, como `"atunes"`, R te lanzará un error porque no se pueden sumar tipos diferentes.
+
+* Intenta ejecutar el siguiente código y lee el mensaje de error:
+
+```{r}
+# Esto provocará un error
+#atunes <- "muchos"
+#total_peces <- truchas_hoy + atunes
+```
+
+*Error in `truchas_hoy + atunes`:*
+*! non-numeric argument to binary operator*
+
+* Ajusta el código para que `atunes` sea un valor numérico, como 10, y luego imprime `total_peces` de nuevo para obtener un resultado correcto.
+
+---
+
+#### **Ejercicio adicional:**
+
+Imagina que tienes tres días de pesca consecutivos y capturas lo siguiente:
+
+* Día 1: 14 peces
+* Día 2: 20 peces
+* Día 3: 18 peces
+
+Crea tres variables (`dia1`, `dia2`, `dia3`), calcula el promedio de capturas y asígnalo a una variable llamada `promedio_capturas`. Imprime el resultado.
+
+```{r}
+# Datos de los tres días
+dia1 <- 14
+dia2 <- 20
+dia3 <- 18
+
+# Calcula el promedio de capturas
+promedio_capturas <- (dia1 + dia2 + dia3) / 3
+promedio_capturas  # Imprime el promedio
+```
+
+---
+
+# Tipos de datos básicos en R
+
+R trabaja con numerosos tipos de datos. Algunos de los más básicos para comenzar son:
+
+* Valores decimales como `4.5` se llaman **numéricos**.
+* Números enteros como `4` se llaman **enteros**. Los enteros también son numéricos.
+* Valores booleanos (`TRUE` o `FALSE`) se llaman **lógicos**.
+* Texto (o cadenas) se llaman **caracteres**.
+
+Fíjate cómo las comillas en el editor indican que `"some text"` es una cadena de texto.
+
+Cambia el valor de las variables:
+
+* `my_numeric` a `42`.
+* `my_character` a `"universe"`. Nota que las comillas indican que `"universe"` es un carácter.
+* `my_logical` a `FALSE`.
+
+¡Ten en cuenta que R distingue entre mayúsculas y minúsculas!
+
+---
+
+## ¿Qué tipo de dato es ese?
+
+¿Recuerdas que cuando sumaste `5 + "six"`, obtuviste un error debido a una incompatibilidad de tipos de datos? Puedes evitar este tipo de situaciones embarazosas comprobando antes el tipo de dato de una variable. Puedes hacerlo con la función `class()`, como muestra el código en el editor.
+
+Completa el código en el editor e imprime también las clases de las variables `my_character` y `my_logical`.
+
+> **Nota**: Ejecutar las sentencias y realizar los ejercicios propuestos de los archivos "tipos de datos numeric/string/logical".
+
+---
+
+# Crear un vector en R
+
+Imagina que durante una semana estuviste saliendo a pescar con tu equipo, registrando los kilogramos de pescado capturado cada día. Una forma práctica de almacenar esta información en R es usando un **vector**.
+
+Un **vector** es una estructura básica que permite almacenar múltiples elementos del mismo tipo: pueden ser números, texto o valores lógicos (`TRUE`/`FALSE`).
+
+#### Ejemplo 1: Vector numérico con capturas diarias
+
+```{r}
+# Captura diaria de peces (en kilogramos)
+capturas_semana <- c(12.5, 8.0, 15.3, 0.0, 22.1)  # De lunes a viernes
+```
+
+Aquí, `capturas_semana` es un vector que guarda los datos de peso capturado cada día. El orden importa: el primer valor es lunes, el segundo martes, etc.
+
+---
+
+## Tipos de vectores
+
+* Vectores de otros tipos:
+
+```{r}
+# Vector de caracteres: nombres de especies
+especies <- c("Merluza", "Sardina", "Atún")
+
+# Vector lógico: ¿Hubo pesca ese día?
+pesca_exitosa <- c(TRUE, TRUE, TRUE, FALSE, TRUE)
+```
+
+---
+
+#### **Ejercicio adicional**
+
+Crear vectores con información de capturas de pesca y realizar un pequeño análisis.
+
+Durante una semana, registraste las **capturas de merluza** (en kg) y de **jurel** (en kg).
+
+| Día       | Merluza | Jurel |
+| --------- | ------- | ----- |
+| Lunes     | 20      | 5     |
+| Martes    | 18      | 0     |
+| Miércoles | 0       | 12    |
+| Jueves    | 25      | 7     |
+| Viernes   | 30      | 10    |
+
+1. Crea dos vectores: `merluza_vector` y `jurel_vector` con los datos anteriores.
+2. Usa `sum()` para calcular el total semanal de cada especie.
+3. Usa `mean()` para calcular la captura media diaria de jurel.
+4. Crea un vector lógico que indique los días donde **hubo captura de ambas especies**.
+
+```{r}
+# Crear vectores con capturas diarias
+merluza_vector <- c(20, 18, 0, 25, 30)
+jurel_vector <- c(5, 0, 12, 7, 10)
+
+# Calcular totales semanales
+total_merluza <- sum(merluza_vector)
+total_jurel <- sum(jurel_vector)
+
+# Calcular promedio diario de jurel
+media_jurel <- mean(jurel_vector)
+
+# Crear vector lógico: ¿Hubo ambas capturas?
+captura_ambas <- (merluza_vector > 0) & (jurel_vector > 0)
+
+# Mostrar resultados
+print(paste("Total merluza:", total_merluza))
+print(paste("Total jurel:", total_jurel))
+print(paste("Media diaria de jurel:", media_jurel))
+print("Días con captura de ambas especies:")
+print(captura_ambas)
+```
+
+---
+
+#### **Reto extra:**
+
+Asigna nombres a los días de la semana para hacer tus vectores más interpretables:
+
+```{r}
+dias <- c("Lunes", "Martes", "Miércoles", "Jueves", "Viernes")
+names(merluza_vector) <- dias
+names(jurel_vector) <- dias
+
+print(merluza_vector)
+```
+
+---
+
+## Nombrar un vector en R
+
+Como analista de pesca, no solo necesitas registrar los datos de tus capturas, sino también tener claro **cuándo** ocurrieron. Es muy importante saber qué valor corresponde a cada día.
+
+En el ejercicio anterior, registraste las capturas semanales de **merluza** y **jurel**, pero al imprimir los vectores, los días no aparecen identificados. Para solucionar esto, puedes **nombrar los elementos del vector** usando la función `names()`.
+
+```{r}
+# Vector de capturas diarias de merluza
+merluza_vector <- c(20, 18, 0, 25, 30)
+
+# Asignar nombres a los elementos (días de la semana)
+names(merluza_vector) <- c("Lunes", "Martes", "Miércoles", "Jueves", "Viernes")
+
+# Ver el resultado
+print(merluza_vector)
+```
+
+---
+
+#### **Ejercicio adicional**
+
+Nombrar los elementos del vector `jurel_vector` utilizando los días de la semana.
+
+1. Crea el vector `jurel_vector` con los valores de capturas diarias.
+2. Usa `names()` para asignar los días: `"Lunes"`, `"Martes"`, `"Miércoles"`, `"Jueves"`, `"Viernes"`.
+
+```{r}
+# Crear vector de capturas de jurel
+jurel_vector <- c(5, 0, 12, 7, 10)
+
+# Asignar nombres directamente
+names(jurel_vector) <- c("Lunes", "Martes", "Miércoles", "Jueves", "Viernes")
+
+# Ver resultado
+print(jurel_vector)
+```
+
+---
+
+### Reutilización eficiente
+
+Como buen científico pesquero, es mejor ser **eficiente** que repetir código. Si vas a usar los días de la semana varias veces, mejor guárdalos en una **variable reutilizable**.
+
+```{r}
+# Crear un vector con los días de la semana
+dias_semana <- c("Lunes", "Martes", "Miércoles", "Jueves", "Viernes")
+
+# Asignar nombres a los vectores de capturas
+names(merluza_vector) <- dias_semana
+names(jurel_vector) <- dias_semana
+
+# Mostrar ambos vectores
+print(merluza_vector)
+print(jurel_vector)
+```
+
+Listo! Ahora puedes reutilizar `dias_semana` en cualquier análisis que hagas durante la semana.
+
+---
+
+#### **Reto adicional:**
+
+Crea un nuevo vector llamado `total_vector` que contenga la **suma diaria** de merluza y jurel, y asígnale también los nombres de los días.
+
+```{r}
+# Suma diaria de capturas
+total_vector <- merluza_vector + jurel_vector
+names(total_vector) <- dias_semana
+
+print(total_vector)
+```
+
+> **Nota**: Ejecutar las sentencias y realizar el ejercicio propuesto del archivo "Vectores en R".
+
+---
+
+# Calcular capturas totales
+
+Ahora que tienes tus capturas de **merluza** y **jurel** organizadas en vectores con los días de la semana, puedes comenzar a hacer un análisis básico para entender mejor tus resultados como pescador. ¿Qué queremos saber?
+
+* ¿Cuántos peces atrapaste **en total por día**?
+* ¿Tuviste una **buena semana de pesca** en general?
+* ¿Capturaste **más merluza o más jurel**?
+
+---
+
+## Suma de vectores en R
+
+R permite sumar vectores **elemento a elemento**. Esto significa que si tienes dos vectores del mismo largo, puedes sumarlos directamente:
+
+```{r}
+# Ejemplo simple
+c(1, 2, 3) + c(4, 5, 6)
+# Resultado: c(5, 7, 9)
+```
+
+También puedes hacer esto con variables:
+
+```{r}
+a <- c(1, 2, 3)
+b <- c(4, 5, 6)
+total <- a + b
+```
+
+---
+
+Supón que estas fueron tus capturas semanales:
+
+```{r}
+# Capturas diarias de merluza (en número de peces)
+merluza_vector <- c(20, 18, 0, 25, 30)
+
+# Capturas diarias de jurel
+jurel_vector <- c(5, 0, 12, 7, 10)
+
+# Asignar nombres a los días
+dias_semana <- c("Lunes", "Martes", "Miércoles", "Jueves", "Viernes")
+names(merluza_vector) <- dias_semana
+names(jurel_vector) <- dias_semana
+```
+
+Ahora sumamos ambos vectores para saber **cuántos peces se capturaron cada día**:
+
+```{r}
+# Total de capturas por día
+total_diario <- merluza_vector + jurel_vector
+print(total_diario)
+```
+
+---
+
+**¿Fue una semana buena en general?** Puedes sumar todos los valores usando `sum()`:
+
+```{r}
+# Total por especie
+total_merluza <- sum(merluza_vector)
+total_jurel <- sum(jurel_vector)
+
+# Total semanal
+total_semana <- total_merluza + total_jurel
+
+# Ver resultados
+print(total_merluza)
+print(total_jurel)
+print(total_semana)
+```
+
+---
+
+## Comparar especies
+
+**¿Capturaste más merluza que jurel?**
+
+```{r}
+# Comparación
+total_merluza > total_jurel
+```
+
+Si el resultado es `TRUE`, tu especialidad parece ser la merluza. Si es `FALSE`, puede que debas replantearte tus estrategias o cambiar de zona de pesca.
+
+---
+
+#### **Ejercicio adicional**
+
+Crear un análisis semanal de capturas con base en tus datos reales o ficticios.
+
+1. Crea vectores con las capturas semanales de dos especies de tu elección (puede ser corvina, lenguado, etc.).
+2. Nombra los días.
+3. Calcula:
+
+   * Total diario.
+   * Total por especie.
+   * Total semanal.
+   * ¿Qué especie capturaste más?
+
+```{r}
+# Reemplaza estos valores por los tuyos
+especie1_vector <- c(10, 12, 8, 9, 15)
+especie2_vector <- c(5, 7, 11, 6, 10)
+
+dias <- c("Lunes", "Martes", "Miércoles", "Jueves", "Viernes")
+names(especie1_vector) <- dias
+names(especie2_vector) <- dias
+
+# Cálculo total diario
+total_dia <- especie1_vector + especie2_vector
+
+# Totales por especie
+total_1 <- sum(especie1_vector)
+total_2 <- sum(especie2_vector)
+total_semana <- total_1 + total_2
+
+# Comparación
+print(total_dia)
+print(total_1 > total_2)
+```
+
+---
+
+Claro, aquí tienes la **adaptación completa al contexto de pesca**, con ejemplos en R que sustituyen el juego por las **capturas de peces**, como **merluza** y **jurel**, a lo largo de la semana. Añadí explicaciones y comentarios prácticos para que sea útil y fácil de seguir:
+
+---
+
+# Selección de vectores: los buenos momentos
+
+Tus datos muestran que capturas **más merluza que jurel**… ¡bien hecho!
+Ahora surge otra pregunta:
+
+> ¿Rindes mejor al **comienzo de la semana** o al **final**, cuando ya estás más cansado (o relajado)?
+
+Para responder esto, necesitas **seleccionar elementos específicos** de tus vectores. En R, esto se hace con corchetes `[]`.
+
+---
+
+## Seleccionar un solo día
+
+Para obtener, por ejemplo, las capturas de merluza del **miércoles**, se puede hacer:
+
+```{r}
+merluza_vector["Miércoles"]
+```
+
+También podrías usar la posición numérica:
+
+```{r}
+merluza_miercoles <- merluza_vector[3]
+print(merluza_miercoles)
+```
+
+---
+
+## Seleccionar varios días
+
+Ahora veamos cuántas merluzas atrapaste en los **días centrales** de la semana: martes, miércoles y jueves. Para eso puedes seleccionar varios elementos con un vector de posiciones:
+
+```{r}
+merluza_mitad <- merluza_vector[c(2, 3, 4)]
+print(merluza_mitad)
+```
+
+---
+
+## Usar rangos para seleccionar
+
+Como escribir `c(2, 3, 4)` es algo largo, puedes usar un rango con `:`:
+
+```{r}
+merluza_mitad2 <- merluza_vector[2:4]
+print(merluza_mitad2)
+```
+
+También puedes hacer lo mismo con **jurel**:
+
+```{r}
+# Capturas de jurel desde martes hasta viernes
+jurel_fin_semana <- jurel_vector[2:5]
+print(jurel_fin_semana)
+```
+
+---
+
+## Seleccionar usando nombres
+
+Una forma más legible y clara es seleccionar por los **nombres de los días**. Esto es muy útil cuando compartes tu código:
+
+```{r}
+# Usar nombres para los primeros días de la semana
+merluza_inicio <- merluza_vector[c("Lunes", "Martes", "Miércoles")]
+print(merluza_inicio)
+
+# ¿Cuál fue el promedio de capturas al inicio de semana?
+mean_inicio <- mean(merluza_inicio)
+print(mean_inicio)
+```
+
+---
+
+#### **Ejercicio adicional:**
+
+Crea un pequeño análisis de tu rendimiento de pesca seleccionando días específicos.
+
+Comparar el rendimiento del inicio y del final de la semana para dos especies de peces.
+
+1. Crea dos vectores: uno para `corvina_vector` y otro para `lenguado_vector`, con datos de lunes a viernes.
+2. Asigna nombres de días a los vectores.
+3. Selecciona:
+
+   * Los **tres primeros días** usando nombres.
+   * Los **dos últimos días** usando rangos numéricos.
+4. Calcula el **promedio** de capturas en cada periodo.
+
+```{r}
+# Datos ficticios
+corvina_vector <- c(10, 15, 12, 5, 8)
+lenguado_vector <- c(3, 7, 6, 4, 9)
+
+dias <- c("Lunes", "Martes", "Miércoles", "Jueves", "Viernes")
+names(corvina_vector) <- dias
+names(lenguado_vector) <- dias
+
+# Selecciones
+corvina_inicio <- corvina_vector[c("Lunes", "Martes", "Miércoles")]
+lenguado_fin <- lenguado_vector[4:5]
+
+# Promedios
+mean_corvina_inicio <- mean(corvina_inicio)
+mean_lenguado_fin <- mean(lenguado_fin)
+
+# Mostrar resultados
+print(mean_corvina_inicio)
+print(mean_lenguado_fin)
+```
+
+---
+
+# Selección por comparación – Paso 1
+
+Como pescador analítico, puedes preguntarte:
+
+> ¿En qué días **atrapé peces** y en cuáles no?
+
+R lo hace fácil con **operadores de comparación**, como:
+
+* `<` menor que
+* `>` mayor que
+* `<=` menor o igual que
+* `>=` mayor o igual que
+* `==` igual a
+* `!=` distinto de
+
+En vectores, R aplicará la comparación **elemento por elemento**. Mira este ejemplo:
+
+```{r}
+c(3, 0, 5) > 0
+# [1] TRUE FALSE TRUE
+```
+
+Supongamos que tienes este vector con las capturas de **merluza**:
+
+```{r}
+merluza_vector <- c(5, 0, 7, 0, 2)
+names(merluza_vector) <- c("Lunes", "Martes", "Miércoles", "Jueves", "Viernes")
+```
+
+Para verificar en qué días pescaste **al menos una merluza**, usa:
+
+```{r}
+selection_vector <- merluza_vector > 0
+print(selection_vector)
+```
+
+---
+
+## Selección por comparación – Paso 2
+
+Ahora que ya sabes en qué días tuviste éxito, puedes **filtrar directamente** el número de capturas en esos días:
+
+```{r}
+merluza_dias_con_pesca <- merluza_vector[selection_vector]
+print(merluza_dias_con_pesca)
+```
+
+R seleccionará solo los valores del vector `merluza_vector` donde `selection_vector` es `TRUE`.
+
+---
+
+## Selección avanzada – con otra especie
+
+También puedes analizar otras especies, por ejemplo, **jurel**:
+
+```{r}
+jurel_vector <- c(0, 4, 3, 0, 6)
+names(jurel_vector) <- c("Lunes", "Martes", "Miércoles", "Jueves", "Viernes")
+```
+
+***¿Cuándo atrapaste jurel?***
+
+```{r}
+selection_jurel <- jurel_vector > 0
+jurel_dias_exito <- jurel_vector[selection_jurel]
+
+print(selection_jurel)
+print(jurel_dias_exito)
+```
+
+---
+
+#### **Ejercicio adicional:**
+
+Filtrar solo los días en que capturaste **más de 5 peces** de cualquier especie.
+
+```{r}
+lenguado_vector <- c(3, 6, 1, 8, 5)
+names(lenguado_vector) <- c("Lunes", "Martes", "Miércoles", "Jueves", "Viernes")
+
+# Seleccionar días con más de 5 capturas
+dias_con_mucha_captura <- lenguado_vector > 5
+lenguado_muchos <- lenguado_vector[dias_con_mucha_captura]
+
+print(lenguado_muchos)
+```
+
+---
+
+
+
+
+
+
