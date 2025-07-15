@@ -4,7 +4,7 @@ subtitle: "Módulo 2. Matrices, factores y datatables"
 author: "Julio Úbeda Quesada"
 date: "`r format(Sys.time(), '%d/%m/%Y, %H:%M')`"
 abstract: |
- Este documento corresponde al segundo día del curso básico de R...
+ Este módulo te introduce a las estructuras de datos fundamentales en R: **matrices**, **factores** y **data frames**. Aprenderás a crear, manipular y analizar estos tipos de datos, lo que te permitirá organizar y explorar información de manera efectiva.
 output: 
   html_document:
     df_print: paged
@@ -383,7 +383,7 @@ rm(list=ls())
 
 #--------------ESPACIO DE TRABAJO Y RUTAS RELATIVAS---------------#
 # Modificar por el path del directorio de trabajo 
-home_file  = "C:/Users/jubeda2/Downloads/Curso R Basico/Modulo 2. Matrices, factores y datatables"
+home_file  = "~/Documents/GitHub/Curso-R-Basico/Modulo 2. Matrices, factores y datatables"
 data_loc   = paste0(home_file,"/3. Datos/")
 
 #--------------PAQUETES NECESARIOS PARA EL CURSO---------------#
