@@ -1,8 +1,4 @@
-Aquí tienes una versión ampliada del script original con nuevos apartados sobre **manipulación de datos** en R, manteniendo un enfoque didáctico y coherente con los contenidos previos del curso:
-  
-  ---
-  
-  ```r
+
 # DATA FRAMES: Permiten combinar variables de diferentes tipos (numéricas, lógicas, texto...)
 
 # Creamos vectores con los datos de 6 mareas

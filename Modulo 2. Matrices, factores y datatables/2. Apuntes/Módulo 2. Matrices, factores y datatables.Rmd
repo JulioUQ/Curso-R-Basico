@@ -387,7 +387,7 @@ home_file  = "~/Documents/GitHub/Curso-R-Basico/Modulo 2. Matrices, factores y d
 data_loc   = paste0(home_file,"/3. Datos/")
 
 #--------------PAQUETES NECESARIOS PARA EL CURSO---------------#
-Packages = c("readxl", "tidyverse", "kableExtra", "knitr")
+Packages = c("readxl", "kableExtra", "knitr")
 
 # Instalar los paquetes que no estén instalados
 new_packages <- Packages[!(Packages %in% installed.packages()[,"Package"])]
@@ -404,7 +404,7 @@ Vamos a trabajar con el dataset DatosPesca, que contiene información sobre dese
 file_path <- paste0(data_loc, "DatosPesca.xlsx")
 
 # Cargar el archivo Excel
-df <- read_excel(file_path)
+df <- read_excel("~/Documents/GitHub/Curso-R-Basico/Modulo 2. Matrices, factores y datatables/3. Datos/DatosPesca.xlsx")
 
 # Mostramos la estructura del dataset
 cat("La estructura del conjunto de datos de pesqueros en la zona 27:\n\n")
@@ -440,9 +440,20 @@ colSums(is.na(df))
 Eliminar columnas irrelevantes simplifica el análisis al reducir ruido y evitar duplicidades, mejora la velocidad de procesamiento y facilita la interpretación y visualización de los datos, permitiendo tomar decisiones más claras y eficientes.
 
 ```{r, DropCols}
+# Verificamos las columnas del dataframe
+cat("Columnas del dataframe original:\n")
+
 # Eliminar columnas irrelevantes
-df$CodigoArteDC <- NULL
-df$CODREG <- NULL
+col_norelevantes <- c("CodigoArteDC", "CODREG", "REP_MS", "TIPOREG", 
+                      "SUBTIPO", "TIPO SOLAPE", "YEAR_DC", "FleetSegment")
+
+# Eliminar columnas irrelevantes
+df <- df[, !names(df) %in% col_norelevantes]
+
+# Verificamos las columnas restantes
+colnames(df) %>% 
+          kable(caption = "Columnas del dataframe después de eliminar las irrelevantes:", "html") %>% 
+          kable_styling(font_size = 12, full_width = TRUE)
 ```
 
 **¿Qué hace este bloque de código?**
