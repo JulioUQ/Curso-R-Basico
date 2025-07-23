@@ -24,14 +24,14 @@ Este repositorio contiene el material del curso de introducción a R centrado en
 * RStudio (opcional, pero recomendado)
 * Paquetes requeridos:
 
+  * `readxl`
   * `tidyverse`
-  * `data.table`
   * ...
 
 Puedes instalar los paquetes necesarios con:
 
 ```r
-install.packages(c("tidyverse", "data.table"))
+install.packages(c("tidyverse", "readxl"))
 ```
 
 ## 🚀 Cómo usar este repositorio
