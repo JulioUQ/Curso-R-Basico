@@ -4,7 +4,7 @@ subtitle: "Módulo 3. Manipulacion de datos con Tidyverse"
 author: "Julio Úbeda Quesada"
 date: "`r format(Sys.time(), '%d/%m/%Y, %H:%M')`"
 abstract: |
- Este documento corresponde al segundo día del curso básico de R...
+ Este documento presenta una introducción práctica al uso del paquete tidyverse, enfocado en la manipulación de datos mediante dplyr, en el contexto del análisis de desembarques pesqueros en la zona CIEM 27. Se utiliza el dataset DatosPesca para ilustrar las funciones fundamentales de dplyr, tales como filter(), select(), mutate(), arrange(), summarise(), group_by(), distinct(), count() y case_when(). Se exploran patrones de captura, volúmenes desembarcados, proporciones bajo talla y combinaciones categóricas únicas. Además, se destaca la importancia de transformar, agrupar y clasificar los datos de manera eficiente para facilitar el análisis exploratorio y la toma de decisiones en contextos de sostenibilidad pesquera.
 output: 
   html_document:
     df_print: paged
@@ -27,20 +27,16 @@ knitr::opts_chunk$set(
 
 <!-- LIBRERIAS -->
 
-Antes de comenzar con el análisis de datos, es importante establecer el espacio de trabajo y cargar los paquetes necesarios. Este bloque de código prepara el entorno para trabajar con el paquete tidyverse y otros recursos útiles como kableExtra y knitr.
-
 ```{r load_libraries, include=FALSE, results='hide'}
 rm(list=ls())
 
 #--------------ESPACIO DE TRABAJO Y RUTAS RELATIVAS---------------#
 # Modificar por el path del directorio de trabajo 
-home_file  = "C:/Users/jubeda2/Downloads/Curso R Basico/Modulo 2. Matrices, factores y datatables"
+home_file  = "~/Documents/GitHub/Curso-R-Basico/Modulo 3. Manipulacion de datos con Tidyverse"
 data_loc   = paste0(home_file,"/3. Datos/")
-fig_loc    = paste0(home_file,"/4. Figuras y graficos/")
-Output_loc = paste0(home_file, "/5. Outputs/")
 
 #--------------PAQUETES NECESARIOS PARA EL CURSO---------------#
-Packages = c("tidyverse", "kableExtra", "knitr")
+Packages = c("tidyverse", "kableExtra", "knitr", "readxl")
 
 # Instalar los paquetes que no estén instalados
 new_packages <- Packages[!(Packages %in% installed.packages()[,"Package"])]
@@ -50,25 +46,81 @@ if(length(new_packages)) install.packages(new_packages)
 lapply(Packages, library, character.only = TRUE)
 ```
 
-# Manipulación de datos con Tidyverse
+---
 
-Vamos a trabajar con el dataset DatosPesca, que contiene información sobre desembarques de la flota española en la zona de pesca 27. Utilizaremos funciones del paquete dplyr para manipular y explorar estos datos de forma eficiente.
+# ¿Qué es tidyverse?
+
+**`tidyverse`** es un conjunto de paquetes de R diseñados para facilitar el análisis y manipulación de datos de forma coherente y eficiente. Todos los paquetes del `tidyverse` comparten una filosofía común de trabajo con datos **ordenados (*tidy data*)** y una sintaxis coherente basada en funciones legibles.
+
+## Características principales:
+
+- Utiliza una **sintaxis intuitiva y legible**, basada en el operador **pipe (`%>%`)**.
+- Promueve el trabajo con **datos "ordenados"**, donde:
+    - Cada variable es una columna.
+    - Cada observación es una fila.
+    - Cada valor está en una celda.
+
+## Paquetes principales del `tidyverse`:
+
+- **`ggplot2`**: visualización de datos.
+- **`dplyr`**: manipulación de datos (filtrar, seleccionar, agrupar, resumir…).
+- **`tidyr`**: transformación de estructuras de datos (pivotar, separar, unir…).
+- **`readr`**: importación de datos (CSV, TSV…).
+- **`tibble`**: formato moderno de data frames.
+- **`stringr`**: manejo de cadenas de texto.
+- **`forcats`**: manejo de factores (variables categóricas).
+
+## Ejemplo básico:
+
+```{r, ejemplo_basico}
+# Filtrar y resumir un conjunto de datos
+mtcars %>%
+  as_tibble() %>%
+  filter(mpg > 20) %>%
+  group_by(cyl) %>%
+  summarise(avg_hp = mean(hp))
+```
+
+En resumen, `tidyverse` es ideal para realizar análisis de datos de forma clara, rápida y reproducible.
+
+Claro, aquí tienes una lista con **las funciones más utilizadas del `tidyverse`**, junto con el paquete al que pertenecen:
+
+---
+
+# Manipulación de datos con `dplyr
+
+Vamos a trabajar con el dataset DatosPesca, que contiene información sobre desembarques de la flota española en la zona de pesca 27. Utilizaremos funciones del paquete `dplyr` para manipular y explorar estos datos de forma eficiente.
+
+Las funciones que veremos en este módulo serán las siguientes:
+
+1. **`filter()`** – filtra filas según una condición.
+2. **`select()`** – selecciona columnas.
+3. **`mutate()`** – crea o modifica columnas.
+4. **`arrange()`** – ordena filas por una o más variables.
+5. **`summarise()`** – resume datos (por ejemplo, calcular medias).
+6. **`group_by()`** – agrupa datos para operaciones por grupo.
+7. **`distinct()`** – elimina duplicados.
+8. **`rename()`** – cambia nombres de columnas.
+9. **`count()`** – cuenta ocurrencias de combinaciones de variables.
+10. **`case_when()`** – crea variables condicionales complejas.
+
+Comencemos cargando el set de datos con el que trabajaremos durante el módulo y las prácticas.
 
 ```{r, Input}
 # Definir la ruta del archivo
 file_path <- paste0(data_loc, "DatosPesca.xlsx")
 
 # Cargar el archivo Excel
-df <- read_excel(file_path)
+DatosPesca <- read_excel(file_path)
 
 # Mostramos la estructura del dataset
 cat("La estructura del conjunto de datos de pesqueros en la zona 27:\n\n")
-str(df)
+str(DatosPesca)
 ```
 
 ## `filter()` — Filtrar registros relevantes
 
-Filtrar observaciones es una de las tareas más frecuentes y útiles al trabajar con datos. La función filter() del paquete dplyr nos permite seleccionar filas que cumplen con condiciones específicas, haciendo el análisis más focalizado y eficiente.
+Filtrar observaciones es una de las tareas más frecuentes y útiles al trabajar con datos. La función `filter()` del paquete `dplyr` nos permite seleccionar filas que cumplen con condiciones específicas, haciendo el análisis más focalizado y eficiente.
 
 A continuación, se muestran algunos ejemplos prácticos usando el dataset DatosPesca.
 
@@ -96,9 +148,46 @@ DatosPesca %>%
 
 El código de arte "OTB" corresponde al arrastre de fondo. Este filtro nos permite analizar exclusivamente las capturas realizadas con este tipo de arte.
 
+##  `select()` — Seleccionar columnas útiles (1)
+
+La función `select()` nos permite elegir únicamente las columnas necesarias para un análisis, visualización o reporte. Esto ayuda a trabajar con dataframes más ligeros y enfocados.
+
+```{r, SelectVars_1}
+# Seleccionar solo columnas clave para reporte
+DatosPesca %>%
+  select(YEAR_DC, MONTH, AL3Especie, Zona, CodigoArte, PesoDesembarcadoVivoTotal)
+```
+
+Este ejemplo extrae solo las columnas relevantes: año, mes, especie, zona, arte de pesca y peso total desembarcado. Ideal para preparar datos antes de graficar o exportar.
+
+```{r, SelectVars_2}
+# Excluir variables de registro administrativo
+DatosPesca %>%
+  select(-CODREG, -TIPOREG, -CLASIFICACION_MAREA)
+```
+
+Aquí usamos - para eliminar variables que no son útiles para el análisis. Esto simplifica el conjunto de datos sin perder información relevante.
+
+## `select()` — Seleccionar columnas útiles (2)
+
+Puedes combinar select() con funciones auxiliares como:
+
+- `starts_with("...")` — selecciona columnas que comienzan con cierto texto.
+- `ends_with("...")` — columnas que terminan con cierto texto.
+- `contains("...")` — columnas que contienen una cadena específica.
+
+```{r, Regular}
+DatosPesca %>%
+  select(
+    starts_with("Peso"),       # Columnas que empiezan con "Peso"
+    ends_with("Total"),        # Columnas que terminan en "Total"
+    contains("Arte")           # Columnas que contienen la palabra "Arte"
+  )
+```
+
 ## `mutate()` — Crear nuevas columnas
 
-La función mutate() de dplyr permite crear nuevas variables o transformar las existentes en un dataframe. Es especialmente útil cuando necesitamos derivar información adicional a partir de los datos originales, como convertir unidades o calcular proporciones.
+La función `mutate()` de `dplyr` permite crear nuevas variables o transformar las existentes en un dataframe. Es especialmente útil cuando necesitamos derivar información adicional a partir de los datos originales, como convertir unidades o calcular proporciones.
 
 Veamos algunos ejemplos útiles en el contexto del análisis pesquero:
 
@@ -131,120 +220,9 @@ DatosPesca %>%
 
 Esto ahorra líneas de código y mejora la legibilidad del script.
 
-## `rename()` — Renombrar columnas para mayor claridad
+## `arrange()` — Ordenar datos para interpretación
 
-Cuando trabajas con datasets provenientes de sistemas administrativos o bases externas, los nombres de columnas suelen ser poco descriptivos o demasiado técnicos. Con rename() puedes asignar nombres más claros y legibles, lo que facilita el análisis y la comunicación de resultados.
-
-```{r, rename_1}
-DatosPesca %>%
-  rename(
-    Especie = AL3Especie,
-    Peso_kg = PesoDesembarcadoVivoTotal,
-    ArtePesca = CodigoArte
-  )
-```
-
-Este ejemplo renombra tres columnas:
-
-- AL3Especie → Especie
-- PesoDesembarcadoVivoTotal → Peso_kg
-- CodigoArte → ArtePesca
-
-Esto hace que las columnas tengan nombres más intuitivos, especialmente útil al presentar resultados a audiencias no técnicas.
-
-
-## 🧠 `summarize()` + `group_by()` — Resúmenes por grupo
-
-La combinación de group_by() y summarize() permite agrupar datos por una o más variables y luego calcular resúmenes estadísticos como totales, medias o proporciones.
-
-Esto es fundamental para obtener resultados agregados, como el total desembarcado por especie o el porcentaje de capturas bajo talla.
-
-```{r, Groupby_1}
-# Total desembarcado por especie
-DatosPesca %>%
-  group_by(AL3Especie) %>%
-  summarize(total_kg = sum(PesoDesembarcadoVivoTotal, na.rm = TRUE))
-```
-
-Agrupa los datos por especie (AL3Especie) y calcula el total de kilogramos desembarcados para cada una.
-
-```{r, Groupby_2}
-# Captura promedio mensual por especie
-DatosPesca %>%
-  group_by(AL3Especie, MONTH) %>%
-  summarize(promedio_mensual = mean(PesoDesembarcadoVivoTotal, na.rm = TRUE))
-```
-
-Este resumen incluye dos niveles de agrupación: por especie y por mes. Nos ayuda a identificar patrones estacionales en las capturas.
-
-```{r}
-# Porcentaje de capturas bajo talla por especie
-DatosPesca %>%
-  group_by(AL3Especie) %>%
-  summarize(
-    total = sum(PesoDesembarcadoVivoTotal, na.rm = TRUE),
-    bajo_talla = sum(PesoDesembarcadoVivoBajoTalla, na.rm = TRUE),
-    pct_bajo_talla = bajo_talla / total * 100
-  )
-```
-
-Este bloque calcula el porcentaje de peso bajo talla para cada especie, una métrica clave para evaluar la sostenibilidad pesquera.
-
-## 🔗 `ungroup()` — Eliminar agrupaciones para siguientes análisis
-
-Después de aplicar group_by(), los datos quedan agrupados internamente, lo cual puede afectar pasos posteriores. Usar ungroup() elimina esa agrupación, permitiendo continuar con otras operaciones sin heredar ese comportamiento.
-
-```{r, Ungroup}
-# Total por especie, luego desagrupar y ordenar
-DatosPesca %>%
-  group_by(AL3Especie) %>%
-  summarize(total_kg = sum(PesoDesembarcadoVivoTotal, na.rm = TRUE)) %>%
-  ungroup() %>%
-  arrange(desc(total_kg))
-```
-
-Este ejemplo resume por especie, elimina la agrupación y ordena el resultado para mostrar primero las especies con mayor volumen de desembarque.
-
-## 📋 `select()` — Seleccionar columnas útiles (1)
-
-La función select() nos permite elegir únicamente las columnas necesarias para un análisis, visualización o reporte. Esto ayuda a trabajar con dataframes más ligeros y enfocados.
-
-```{r, SelectVars}
-# Seleccionar solo columnas clave para reporte
-DatosPesca %>%
-  select(YEAR_DC, MONTH, AL3Especie, Zona, CodigoArte, PesoDesembarcadoVivoTotal)
-```
-
-Este ejemplo extrae solo las columnas relevantes: año, mes, especie, zona, arte de pesca y peso total desembarcado. Ideal para preparar datos antes de graficar o exportar.
-
-```{r}
-# Excluir variables de registro administrativo
-DatosPesca %>%
-  select(-CODREG, -TIPOREG, -CLASIFICACION_MAREA)
-```
-
-Aquí usamos - para eliminar variables que no son útiles para el análisis. Esto simplifica el conjunto de datos sin perder información relevante.
-
-## 📋 `select()` — Seleccionar columnas útiles (2)
-
-Puedes combinar select() con funciones auxiliares como:
-
-- `starts_with("...")` — selecciona columnas que comienzan con cierto texto.
-- `ends_with("...")` — columnas que terminan con cierto texto.
-- `contains("...")` — columnas que contienen una cadena específica.
-
-```{r, Regular}
-DatosPesca %>%
-  select(
-    starts_with("Peso"),       # Columnas que empiezan con "Peso"
-    ends_with("Total"),        # Columnas que terminan en "Total"
-    contains("Arte")           # Columnas que contienen la palabra "Arte"
-  )
-```
-
-## 🔽 `arrange()` — Ordenar datos para interpretación
-
-Ordenar los datos permite detectar patrones importantes como los mayores volúmenes de captura por especie o puerto. Con arrange() de dplyr, puedes organizar los resultados en orden ascendente o descendente, lo que mejora la claridad del análisis.
+Ordenar los datos permite detectar patrones importantes como los mayores volúmenes de captura por especie o puerto. Con `arrange()` de `dplyr`, puedes organizar los resultados en orden ascendente o descendente, lo que mejora la claridad del análisis.
 
 ```{r, arrange_1}
 # Ordenar especies por mayor desembarque
@@ -266,26 +244,175 @@ DatosPesca %>%
 
 Aquí agrupamos por puerto de desembarque y ordenamos según el volumen total capturado. Esto permite identificar los principales puntos logísticos de desembarque.
 
-## 📈 Bonus: Gráficos rápidos con `ggplot2`
+## `summarise()` — Resúmenes globales
+
+`summarise()` sin `group_by()` calcula estadísticas **para todo el conjunto de datos**. Es útil para obtener valores agregados generales, como totales, medias o conteos.
+
+```{r, sumamrise_1}
+# Total y media del peso desembarcado
+DatosPesca %>%
+  summarise(
+    total_kg = sum(PesoDesembarcadoVivoTotal, na.rm = TRUE),
+    media_kg = mean(PesoDesembarcadoVivoTotal, na.rm = TRUE),
+    n_registros = n()
+  )
+```
+
+## `group_by()` — Agrupar sin resumir
+
+`group_by()` agrupa los datos internamente, pero no los modifica. Sirve como paso intermedio para aplicar funciones como `mutate()`, `filter()`, o `slice()` dentro de cada grupo.
+
+```{r, group_by_1}
+# Agrupar por especie sin resumir
+DatosPesca %>%
+  group_by(AL3Especie) %>%
+  slice_head(n = 3)  # Ver los primeros 3 registros por especie
+```
+
+## `summarise()` + `group_by()` — Resúmenes por grupo
+
+Combinar `group_by()` y `summarise()` permite calcular estadísticas dentro de cada grupo (por especie, mes, arte, etc.).
+
+
+```{r, group_by_sumarise_1}
+# Total desembarcado por especie
+DatosPesca %>%
+  group_by(AL3Especie) %>%
+  summarise(total_kg = sum(PesoDesembarcadoVivoTotal, na.rm = TRUE))
+```
+
+Agrupa los datos por especie (`AL3Especie`) y calcula el total de kilogramos desembarcados por especie.
+
+```{r, group_by_sumarise_2}
+# Captura promedio mensual por especie
+DatosPesca %>%
+  group_by(AL3Especie, MONTH) %>%
+  summarise(promedio_mensual = mean(PesoDesembarcadoVivoTotal, na.rm = TRUE))
+```
+
+Este resumen incluye **dos niveles de agrupación**: por especie y por mes. Es útil para identificar **patrones estacionales**.
 
 ```{r}
-# Captura mensual por especie (top 5)
-top_especies <- DatosPesca %>%
-  group_by(AL3Especie) %>%
-  summarize(total = sum(PesoDesembarcadoVivoTotal, na.rm = TRUE)) %>%
-  slice_max(order_by = total, n = 5) %>%
-  pull(AL3Especie)
-
+# Porcentaje de capturas bajo talla por especie
 DatosPesca %>%
-  filter(AL3Especie %in% top_especies) %>%
-  group_by(AL3Especie, MONTH) %>%
-  summarize(total = sum(PesoDesembarcadoVivoTotal, na.rm = TRUE)) %>%
-  ggplot(aes(x = MONTH, y = total, color = AL3Especie)) +
-  geom_line(size = 1.2) +
-  labs(title = "Captura mensual por especie (Top 5)", y = "kg", x = "Mes") +
-  theme_minimal()
+  group_by(AL3Especie) %>%
+  summarise(
+    total = sum(PesoDesembarcadoVivoTotal, na.rm = TRUE),
+    bajo_talla = sum(PesoDesembarcadoVivoBajoTalla, na.rm = TRUE),
+    pct_bajo_talla = (bajo_talla / total) * 100
+  )
 ```
+
+Este cálculo es esencial para evaluar la sostenibilidad de las capturas pesqueras, destacando qué proporción del total es **bajo talla**.
+
+## `ungroup()` — Eliminar agrupaciones para siguientes análisis
+
+Después de aplicar `group_by()`, los datos quedan agrupados internamente, lo cual puede afectar pasos posteriores. Usar ungroup() elimina esa agrupación, permitiendo continuar con otras operaciones sin heredar ese comportamiento.
+
+```{r, Ungroup}
+# Total por especie, luego desagrupar y ordenar
+DatosPesca %>%
+  group_by(AL3Especie) %>%
+  summarize(total_kg = sum(PesoDesembarcadoVivoTotal, na.rm = TRUE)) %>%
+  ungroup() %>%
+  arrange(desc(total_kg))
+```
+
+Este ejemplo resume por especie, elimina la agrupación y ordena el resultado para mostrar primero las especies con mayor volumen de desembarque.
+
+## `distinct()` — Combinaciones únicas de categorías
+
+`distinct()` permite obtener **filas únicas** de una o más columnas. Es muy útil para explorar la diversidad de combinaciones categóricas.
+
+```{r, distinct}
+# Especies únicas capturadas por arte de pesca
+DatosPesca %>%
+  distinct(CodigoArte, AL3Especie) %>%
+  arrange(CodigoArte, AL3Especie)
+```
+
+Este código devuelve una lista sin duplicados de las especies asociadas a cada tipo de arte de pesca (`CodigoArte`), ordenadas alfabéticamente.
+
+## `count()` — Conteo de ocurrencias
+
+`count()` es una forma rápida de **contar filas** por combinación de variables. Equivale a `group_by(...) %>% summarise(n = n())`.
+
+```{r, count_1}
+# Número de registros por especie
+DatosPesca %>%
+  count(AL3Especie, sort = TRUE)
+```
+
+Muestra cuántas veces aparece cada especie en los datos, ordenando de mayor a menor frecuencia.
+
+```{r, count_2}
+# Número de especies distintas por arte
+DatosPesca %>%
+  distinct(CodigoArte, AL3Especie) %>%
+  count(CodigoArte, sort = TRUE)
+```
+
+Aquí se cuenta cuántas especies diferentes están asociadas a cada arte de pesca.
+
+## `case_when()` — Clasificación condicional
+
+`case_when()` permite crear columnas nuevas con **clasificaciones condicionales**, similar a una estructura `if-else`múltiple. Ideal para categorizar valores numéricos o texto.
+
+```{r, case_when_1}
+# Clasificar capturas por tamaño en tres rangos
+DatosPesca %>%
+  mutate(
+    categoria_peso = case_when(
+      PesoDesembarcadoVivoTotal < 100 ~ "Bajo",
+      PesoDesembarcadoVivoTotal >= 100 & PesoDesembarcadoVivoTotal < 500 ~ "Medio",
+      PesoDesembarcadoVivoTotal >= 500 ~ "Alto",
+      TRUE ~ NA_character_  # Para valores NA
+    )
+  ) %>%
+  count(categoria_peso)
+```
+
+Este ejemplo crea una variable `categoria_peso` según el peso desembarcado y muestra cuántos registros hay en cada categoría.
+
+## `rename()` — Renombrar columnas para mayor claridad
+
+Cuando trabajas con datasets provenientes de sistemas administrativos o bases externas, los nombres de columnas suelen ser poco descriptivos o demasiado técnicos. Con `rename()` puedes asignar nombres más claros y legibles, lo que facilita el análisis y la comunicación de resultados.
+
+```{r, rename_1}
+DatosPesca %>%
+  rename(
+    Especie = AL3Especie,
+    Peso_kg = PesoDesembarcadoVivoTotal,
+    ArtePesca = CodigoArte
+  )
+```
+
+Este ejemplo renombra tres columnas:
+
+- AL3Especie → Especie
+- PesoDesembarcadoVivoTotal → Peso_kg
+- CodigoArte → ArtePesca
+
+Esto hace que las columnas tengan nombres más intuitivos, especialmente útil al presentar resultados a audiencias no técnicas.
+
 
 ---
 
-## ✅ Conclusiones
+#  Conclusiones
+
+1. **`tidyverse` proporciona una gramática coherente y legible** para la manipulación de datos, lo que mejora la claridad y reproducibilidad de los análisis.
+
+2. Las funciones de `dplyr` permiten realizar transformaciones clave sobre conjuntos de datos pesqueros:
+    - `filter()` y `select()` ayudan a focalizar los análisis en variables y observaciones relevantes.
+    - `mutate()` permite derivar nuevas métricas útiles, como toneladas o proporciones bajo talla.
+    - `arrange()` y `summarise()` facilitan la exploración de patrones y resúmenes cuantitativos.
+    
+3. **Las operaciones con `group_by()` y `summarise()` son esenciales** para obtener estadísticas desagregadas por especie, arte de pesca, puerto o período temporal.
+    
+4. Funciones adicionales como `distinct()`, `count()` y `case_when()` **amplían las capacidades de análisis categórico y condicional**, permitiendo clasificar y contar con alta flexibilidad.
+    
+5. La correcta utilización de `ungroup()` evita errores en operaciones posteriores, **garantizando resultados consistentes** tras resúmenes por grupo.
+    
+6. En conjunto, este flujo de trabajo facilita el desarrollo de análisis exploratorios de datos pesqueros con enfoque reproducible, escalable y compatible con prácticas modernas de ciencia de datos en R.
+    
+
