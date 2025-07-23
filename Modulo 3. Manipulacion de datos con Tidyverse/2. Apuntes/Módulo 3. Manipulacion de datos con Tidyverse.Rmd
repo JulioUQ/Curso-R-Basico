@@ -83,8 +83,6 @@ mtcars %>%
 
 En resumen, `tidyverse` es ideal para realizar análisis de datos de forma clara, rápida y reproducible.
 
-Claro, aquí tienes una lista con **las funciones más utilizadas del `tidyverse`**, junto con el paquete al que pertenecen:
-
 ---
 
 # Manipulación de datos con `dplyr
